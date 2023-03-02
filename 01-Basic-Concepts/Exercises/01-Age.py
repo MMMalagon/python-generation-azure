@@ -10,12 +10,13 @@ current_date = datetime.now().date()
 while True:
     try:
         str_birth_date = input(
-            "Insert your date of birth in the given form (DD-MM-YYYY): ")
+            "Insert your date of birth in the given form (DD-MM-YYYY) or press 'Q' to exit: ")
+        if str_birth_date.upper() == 'Q':
+            print("Exiting...")
+            exit(0)
         birth_date = datetime.strptime(str_birth_date, "%d-%m-%Y").date()
     except ValueError as e:
         print("Incorrect date format. Please, review the input and try again.")
-        # print(e)
-        # traceback.print_exc()
     except Exception as e:
         print("Some fatal error happened. Here is the error and the traceback:")
         print(e)
