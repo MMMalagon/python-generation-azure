@@ -44,7 +44,8 @@ speed = (distance / 1000) / (duration / 60)
 print(f"Train speed is: {speed:.2f} kph")
 
 if speed > high_speed:
-    print(f"The train is above the upper speed limit ({high_speed} kph)!")
+    print(
+        f"The train is above the upper speed limit ({high_speed} kph)!")
 elif speed < slow_speed:
     print(
         f"The train is below the lower speed limit ({slow_speed} kph)!")
