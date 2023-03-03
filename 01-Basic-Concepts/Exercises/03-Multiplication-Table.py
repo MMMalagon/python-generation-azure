@@ -24,7 +24,7 @@ while True:
 
 # for
 
-print("Multiply table using a FOR loop:")
+print("Multiplication table using a FOR loop:")
 
 for i in range(0, 11):
     print(f"{multiply}x{i}: {multiply*i}")
@@ -32,7 +32,7 @@ for i in range(0, 11):
 
 # while
 
-print("Multiply table using a WHILE loop:")
+print("Multiplication table using a WHILE loop:")
 
 i = 0
 
