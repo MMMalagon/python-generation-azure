@@ -30,7 +30,7 @@ while True:
         assert_greater_or_equal_than(duration, 0)
 
     except ValueError as e:
-        print("Input value must be greater than or equal than zero. Try again.")
+        print("Input value must be greater than or equal to zero. Try again.")
     except Exception as e:
         print("Some fatal error happened. Here is the error and the traceback:")
         print(e)
