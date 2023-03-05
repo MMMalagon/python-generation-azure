@@ -8,48 +8,66 @@ under_age = 18
 upper_age = 55
 
 
+class QuitException(Exception):
+    pass
+
+    
 def get_input(prompt):
-    global running
     value = input(prompt)
-
-    if value.upper() == 'Q':
-        running = False
-        return None
-    else:
-        return value
+    return None if value.upper() == 'Q' else value
 
 
-while running:
+def get_age():
+    age = None
+
+    while True:
+        try:
+            str_age = get_input("Insert the age or press 'Q' to exit: ")
+            if str_age is None:
+                raise QuitException
+            else:
+                age = int(str_age)
+                if age < 0:
+                    raise ValueError
+        except ValueError:
+            print("Age must be an integer greater than or equal to zero. Try again.")
+        else:
+            break
+
+    return age
+
+
+def get_score():
+    score = None
+
+    while True:
+        try:
+            str_score = get_input("Insert a score between 0 and 10 or press 'Q' to exit: ")
+            if str_score is None:
+                raise QuitException
+            else:
+                score = int(str_score)
+                if score < 0 or score > 10:
+                    raise ValueError
+        except ValueError:
+                print("Score must be an integer between 0 and 10. Try again.")
+        else:
+            break
+
+    return score
+
+
+
+while True:
 
     age = score = None
 
     try:
+        age = get_age()
+        score = get_score()
 
-        while running:
-            try:
-                str_age = get_input("Insert the age or press 'Q' to exit: ")
-                if not running:
-                    break
-                age = int(str_age)
-                if age < 0:
-                    raise ValueError
-            except ValueError as e:
-                print("Age must be an integer greater than or equal to zero. Try again.")
-            else:
-                break
-
-        while running:
-            try:
-                str_score = get_input("Insert the score or press 'Q' to exit: ")
-                if not running:
-                    break
-                score = int(str_score)
-                if score < 0 or score > 10:
-                    raise ValueError
-            except ValueError as e:
-                print("Score must be an integer between 0 and 10. Try again.")
-            else:
-                break
+    except QuitException:
+        break
 
     except Exception as e:
         print("Some fatal error happened. Here is the error and the traceback:")
@@ -58,8 +76,8 @@ while running:
         exit(1)
 
     else:
-        if running:
-            surveys.append((age, score))
+        surveys.append((age, score))
+
 
 if (len(surveys) > 0):
     print("Survey summary:")
