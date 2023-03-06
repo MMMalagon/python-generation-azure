@@ -14,7 +14,7 @@ class QuitException(Exception):
     
 def get_input(prompt):
     value = input(prompt)
-    return None if value.upper() == 'Q' else value
+    return None if len(value) == 1 and value.upper() == 'Q' else value
 
 
 def get_age():
