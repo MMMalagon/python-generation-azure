@@ -1,4 +1,4 @@
-import traceback
+import traceback, re
 
 
 surveys = []  # [(age, score)]
@@ -14,7 +14,8 @@ class QuitException(Exception):
     
 def get_input(prompt):
     value = input(prompt)
-    return None if len(value) == 1 and value.upper() == 'Q' else value
+    # re.match() throws an exception if value is None -> TypeError
+    return None if re.match('Q', value, re.IGNORECASE) else value
 
 
 def get_age():
@@ -29,7 +30,7 @@ def get_age():
                 age = int(str_age)
                 if age < 0:
                     raise ValueError
-        except ValueError:
+        except (ValueError, TypeError):
             print("Age must be an integer greater than or equal to zero. Try again.")
         else:
             break
@@ -49,7 +50,7 @@ def get_score():
                 score = int(str_score)
                 if score < 0 or score > 10:
                     raise ValueError
-        except ValueError:
+        except (ValueError, TypeError):
                 print("Score must be an integer between 0 and 10. Try again.")
         else:
             break
