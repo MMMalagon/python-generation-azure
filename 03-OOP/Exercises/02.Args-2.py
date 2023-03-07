@@ -56,6 +56,9 @@ def calculate(*args):
                 if len(strings) == 1:
                     raise TypeError
                 strings.append(arg)
+            
+            else:
+                raise TypeError
 
         """         
         if len(integers) != 2 or len(strings) != 1:
