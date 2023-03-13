@@ -1,3 +1,9 @@
+# Filters
+
+print("####################")
+print("##### FILTERS ######")
+print("####################")
+
 numbers = [1, 85, 200, 15, 152, 450, 5, 3601, 63, 77, 8]
 
 print(numbers)
@@ -50,3 +56,35 @@ def custom_filter_v2(func, iter):
 
 print(custom_filter_v2(lambda x: x > 100, numbers))
 ###################################################
+
+
+# Maps
+
+print("####################")
+print("####### MAPS #######")
+print("####################")
+
+numbers = [1, 85, 200, 15, 152, 450, 5, 3601, 63, 77, 8]
+
+print(f"Numbers greaters than 100: ", list(filter(lambda x: x > 100, numbers)))
+print(f"Even numbers: ", list(filter(lambda x: x % 2 == 0, numbers)))
+print(f"Numbers less than 50: ", list(filter(lambda x: x < 50, numbers)))
+
+print("===========================================================================")
+
+
+def process_numbers(numbers):
+    resultado = []
+    for numero in numbers:
+        resultado.append(numero * 10)
+    
+    return resultado
+
+print(numbers)
+print(process_numbers(numbers))
+
+print(list(map(lambda x: x*10, numbers)))
+print(list(map(lambda x: f"{x} x 10 = {x*10}", numbers)))
+
+print(list(map(lambda x: x*10, filter(lambda x: x > 100, numbers))))
+print(list(filter(lambda x: x > 700, map(lambda x: x*10, numbers))))
