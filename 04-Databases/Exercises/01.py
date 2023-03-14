@@ -34,13 +34,6 @@ print()
 # Both with FOR loop and with map() sum()
 # OPTIONAL: aggregate function with $sum and $multiply operators against mongoDB
 # products_with_stock_value_map_sum = list(map(lambda product: product.update({'StockValue': str(float(product['UnitsInStock']) * float(product['UnitPrice']))}), products))
-'''
-products_with_stock_value_map = list(map(lambda product: {**product, **{'StockValue': "{:.2f}".format(float(product['UnitsInStock']) * float(product['UnitPrice']))}}, products))
-
-print('Stock value using map() function:')
-[print(product.get('ProductID'), '-', product.get('ProductName'), '-', 'Stock value:', product.get('StockValue')) for product in products_with_stock_value_map]
-print()
-'''
 
 products_with_stock_value_map = list(map(lambda product: {**product, **{'StockValue': float(product['UnitsInStock']) * float(product['UnitPrice'])}}, products))
 
@@ -61,39 +54,6 @@ print(f"Stock value using for loop - Total is {total:.2f}:")
 [print(product.get('ProductID'), '-', product.get('ProductName'), '-', 'Stock value:', f"{product.get('StockValue'):.2f}") for product in products_with_stock_value_for]
 print()
 
-'''
-products_collection {
-    $addFields: {
-        StockValue: { $multiply: ["$UnitsInStock", "$UnitPrice"] }
-    }
-}
-'''
-
-'''
-products_with_stock_value_aggregate = list(products_collection.aggregate([
-    {
-        "$addFields": {
-            "StockValue": {
-                "$toString": {
-                    "$round": [
-                        {
-                            "$multiply": [
-                                { "$convert": { "input": "$UnitsInStock", "to": "double" } },
-                                { "$convert": { "input": "$UnitPrice", "to": "double" } }
-                            ]
-                        },
-                        2
-                    ]
-                }
-            }
-        }
-    }
-]))
-
-print('Stock value using aggregate function:')
-[print(product.get('ProductID'), '-', product.get('ProductName'), '-', 'Stock value:', product.get('StockValue')) for product in products_with_stock_value_aggregate]
-print()
-'''
 
 products_with_stock_value_aggregate = list(products_collection.aggregate([
     {
@@ -158,59 +118,6 @@ for order in order_and_its_details:
     print(f"Total amount: {total}")
 '''
 
-'''
-pipeline = [
-    {
-        "$match": {
-            "OrderID": order_id
-        }
-    },
-    {
-        "$lookup": {
-            "from": order_details_collection.name,
-            "localField": "OrderID",
-            "foreignField": "OrderID",
-            "as": "order_details"
-        }
-    },
-    {
-        "$unwind": "$order_details"
-    },
-    {
-        '$addFields': {
-            'order_details.Subtotal' : {
-                '$multiply' : [
-                    { "$convert": { "input": "$order_details.UnitPrice", "to": "double" } },
-                    { "$convert": { "input": "$order_details.Quantity", "to": "double" } },
-                ]
-            }
-        }
-    },
-    {
-        "$lookup": {
-            "from": "Products",
-            "localField": "order_details.ProductID",
-            "foreignField": "ProductID",
-            "as": "products"
-        }
-    },
-    {
-      '$unwind': '$products'
-    },
-    {
-        "$addFields": {
-            'TotalPrice' : { '$sum' : '$order_details.Subtotal' }
-        }
-    }
-]
-'''
-'''
-"$group": {
-    '_id': '$OrderID',
-    'TotalPrice' : { '$sum' : '$order_details.Subtotal' },
-    'Products': {}
-}
-'''
 pipeline = [
     {
         "$match": {
@@ -226,7 +133,6 @@ pipeline = [
         }
     },
     {
-        # 
         '$unwind': '$order_details'
     },
     {
@@ -242,11 +148,11 @@ pipeline = [
     {
         '$group': {
             '_id': '$OrderID',
-            'TotalOrderPrice': { '$sum':'$TotalProductPrice' },
+            'TotalOrderPrice': { '$sum': '$TotalProductPrice' },
             # Include all fields from Orders collection
-            'Orders': { '$first':'$$ROOT' },
+            'Orders': { '$first': '$$ROOT' },
             # Include all fields from Order_Details collection
-            'Order_Details': { '$push':'$order_details' }
+            'Order_Details': { '$push': '$order_details' }
         }
     },
     { 
@@ -254,8 +160,8 @@ pipeline = [
             "newRoot": {
                 "$mergeObjects": [
                     "$Orders",
-                    { "TotalOrderPrice":"$TotalOrderPrice" },
-                    { "Order_Details":"$Order_Details" }
+                    { "TotalOrderPrice": "$TotalOrderPrice" },
+                    { "Order_Details": "$Order_Details" }
                 ]
             }
         }
@@ -280,49 +186,6 @@ for order in order_and_its_details:
     print(f"Order #{order['OrderID']} (Total: {order['TotalOrderPrice']:.2f})- {order['ShipName']}, {order['ShipAddress']}, {order['ShipCity']}, {order['ShipCountry']}, {order['OrderDate']}, {order['ShippedDate']}")
     for order_detail in order['Order_Details']:
         print(f" * Product #{order_detail['ProductID']} - {order_detail['UnitPrice']} x {order_detail['Quantity']} = {order_detail['TotalProductPrice']:.2f}")
-        
-'''
-for order in order_and_its_details:
-    print(f"Order #{order['OrderID']} - {order['ShipName']}, {order['ShipAddress']}, {order['ShipCity']}, {order['ShipCountry']}, {order['OrderDate']}, {order['ShippedDate']}, {order['TotalPrice']}")
-'''
-
-'''
-db.Order_Details.aggregate([
-    {
-        "$group": {
-            "_id": "$OrderID",
-            "TotalProductsPrice": {
-                "$sum": {
-                    "$multiply": [
-                        { "$convert": { "input": "$UnitPrice", "to": "double" } },
-                        { "$convert": { "input": "$Quantity", "to": "double" } },
-                    ]
-                }
-            }
-        }
-    },
-    {
-        "$lookup": {
-            "from": db.Orders.name,
-            "localField": "OrderID",
-            "foreignField": "OrderID",
-            "as": "order"
-        }
-    },
-    {
-        "$unwind": "$order"
-    },
-    {
-        "$addFields": { "order.TotalPrice": "$TotalProductsPrice" }
-    },
-    {
-        "$replaceRoot": { "newRoot": "$order" }
-    },
-    {
-        "$out": "Orders"
-    }
-])
-'''
 
 # print(f"{product:<30} {text:<10}")
 
