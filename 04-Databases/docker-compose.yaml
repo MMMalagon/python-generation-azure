@@ -14,6 +14,20 @@ services:
     networks:
       - mongodb-net
 
+  mssql-server:
+    image: mcr.microsoft.com/mssql/server:2022-CU1-ubuntu-20.04
+    restart: always
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=YourStrong@Passw0rd
+      - MSSQL_PID=Express
+    ports:
+      - 1433:1433
+    volumes:
+      - mssql-server-vol:/var/opt/mssql/data
+    networks:
+      - mssql-server-net
+
 volumes:
   mongodb-vol:
     driver: local
@@ -22,5 +36,13 @@ volumes:
       o: bind
       device: D:\docker\mongodb-vol
 
+  mssql-server-vol:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: D:\docker\mssql-server-vol
+
 networks:
   mongodb-net:
+  mssql-server-net:
