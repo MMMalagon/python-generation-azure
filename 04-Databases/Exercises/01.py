@@ -136,7 +136,19 @@ pipeline = [
         '$unwind': '$order_details'
     },
     {
+        '$lookup': {
+            'from': 'Products',
+            'localField': 'order_details.ProductID',
+            'foreignField': 'ProductID',
+            'as': 'product_details'
+        }
+    },
+    {
+        '$unwind': '$product_details'
+    },
+    {
         '$addFields': {
+            "order_details.ProductInfo": "$product_details",
             'order_details.TotalProductPrice': {
                 '$multiply': [
                     { "$toDouble": "$order_details.UnitPrice" },
@@ -173,7 +185,8 @@ pipeline = [
         # but in this case neither StackOverflow nor MongoDB
         # documentation are giving me enough information.
         "$project": {
-            "order_details": 0
+            "order_details": 0,
+            "product_details": 0
         }
     }
 ]
@@ -185,7 +198,7 @@ order_and_its_details = orders_collection.aggregate(pipeline)
 for order in order_and_its_details:
     print(f"Order #{order['OrderID']} (Total: {order['TotalOrderPrice']:.2f})- {order['ShipName']}, {order['ShipAddress']}, {order['ShipCity']}, {order['ShipCountry']}, {order['OrderDate']}, {order['ShippedDate']}")
     for order_detail in order['Order_Details']:
-        print(f" * Product #{order_detail['ProductID']} - {order_detail['UnitPrice']} x {order_detail['Quantity']} = {order_detail['TotalProductPrice']:.2f}")
+        print(f" * Product #{order_detail['ProductID']} ({order_detail['ProductInfo']['ProductName']}): {order_detail['UnitPrice']} x {order_detail['Quantity']} = {order_detail['TotalProductPrice']:.2f}")
 
 # print(f"{product:<30} {text:<10}")
 
