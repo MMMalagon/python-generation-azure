@@ -161,6 +161,32 @@ except requests.exceptions.JSONDecodeError:
 ################################################################################
 
 
+url = "https://openapi.emtmadrid.es/v2/citymad/places/parkings/availability/"
+
+response = requests.get(url=url, headers=headers)
+
+try:
+    response.raise_for_status()
+    parkings = response.json()
+
+    availables = list(filter(lambda x: isinstance(x['freeParking'], int) and x['freeParking'] > 0, parkings['data']))
+
+    print("Parkings available:")
+    # [print(f" * {available['name']} ({available['address']}) - Available: {available['freeParking']}") for available in availables]
+    [print(f" * Available: {available['freeParking']:>4d} - Parking: {available['name']} [{available['address']}]") for available in availables]
+    # print(f"Total free: {sum(available['freeParking'] for available in availables):>6d}")
+    print(f"Total free: {sum(map(lambda x: x['freeParking'], availables)):>6d}")
+
+except requests.exceptions.HTTPError:
+    print(f"HTTP error: {response.status_code} - {response.reason}")
+
+except requests.exceptions.JSONDecodeError:
+    print(f"Error while decoding response as JSON.")
+
+
+################################################################################
+
+
 url = "https://openapi.emtmadrid.es/v1/mobilitylabs/user/logout/"
 
 response = requests.get(url=url, headers=headers)
