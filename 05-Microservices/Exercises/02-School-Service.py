@@ -29,7 +29,8 @@ class Person:
     enrollmentDate = None
 
     def __init__(self, personID: int, lastName: str, firstName: str,
-                 hireDate: str = None, enrollmentDate: str = None) -> None:
+                 hireDate: str = None, enrollmentDate: str = None,
+                 **kwargs) -> None:
         self.__personID = personID
         self.lastName = lastName
         self.firstName = firstName
@@ -68,11 +69,7 @@ class PeopleService:
             people = list()
 
             for person in response.json():
-                people.append(Person(person['personID'],
-                                     person['lastName'],
-                                     person['firstName'],
-                                     person['hireDate'],
-                                     person['enrollmentDate']))
+                people.append(Person(**person))
 
             return people
 
@@ -86,11 +83,7 @@ class PeopleService:
 
             person = response.json()
 
-            return Person(person['personID'],
-                          person['lastName'],
-                          person['firstName'],
-                          person['hireDate'],
-                          person['enrollmentDate'])
+            return Person(**person)
 
         except:
             return None
@@ -113,11 +106,7 @@ class PeopleService:
 
             person['personID'] = response.json()['personID']
 
-            return Person(person['personID'],
-                          person['lastName'],
-                          person['firstName'],
-                          person['hireDate'],
-                          person['enrollmentDate'])
+            return Person(**person)
 
         except:
             return None
